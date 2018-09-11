@@ -28,55 +28,61 @@ library(Boruta)     # feature selection heuristic
 setwd("~/QSU/DHS_boruta")
 # load missinginess and murho fucntions
 source("0_fn.R")
-# # *****************************************************
-# # A function that identifies the degree of missinginess
-# # in a variable.
-# missingness <- function(var) {
-#     if (is.character(var)) {
-#         count_miss <- sum(as.numeric(var == ""))
-#     }
-#     else {
-#         count_miss <- sum(as.numeric(is.na(var)))
-#     }
-#     # count_blnk <- sum(as.numeric(ky[,var] == ""))
-#     count_ttl <- length(var)
-#     return(count_miss/count_ttl)
-# }
+
+# get list of surveys
+
+survey_dir <- "/Users/echow/DHS_live_abstract/DHS_live_abstract/"
+mtadat_dir <- "/Users/echow/DHS_live_abstract/meta_data/"
+survey_files <- list.files(survey_dir)
+surveys <- substr(survey_files,1,4) # the survey country/wave ie: zw61
+
+# ---------------------------
+# for each survey, run boruta
+for (survey in surveys) {
+    # get the survey filepath and it's corresponding metadata filepath
+    survey_filepath <- str_c(survey_dir, survey, "_flattened.dta", sep="")
+    mtadat_filepath <- str_c(mtadat_dir, survey, "_metadat.dta", sep="")
+
+    # print it out
+    cat(survey_filepath, mtadat_filepath,"\n")
+}
+
+
+
 
 
 # -------------------------------------------
 # read in the data for Zimbabwe 9143 vars
-# ky.raw <- read_dta("/Volumes/echow/DATA_DHS/Zimbabwe_2015/ky71_flattened_v12.dta")
-ky.raw <- read_dta("/Users/echow/DHS_live/Kenya/Standard\ DHS\ 2003/ke42_flattened_v12.dta")
-
-ky.raw <- data.frame(ky.raw)
-head(ky.raw[,1:10])
-dim(ky.raw) # 43,706 obs,   9143 vars
+# survey <- read_dta("/Volumes/echow/DATA_DHS/Zimbabwe_2015/ky71_flattened_v12.dta")
+survey <- read_dta("/Users/echow/DHS_live_abstract/DHS_live_abstract/ao71_flattened.dta")
+survey <- data.frame(survey)
+dim(survey) # 43,706 obs,   9143 vars
 
 # meta data
-meta <- read_dta("/Users/echow/DHS_live/Kenya/Standard\ DHS\ 2003/meta_data.dta")
+meta <- read_dta("/Users/echow/DHS_live_abstract/meta_data/ao71_metadat.dta")
 meta <- data.frame(meta)
-head(meta)
 dim(meta)    # 5,809 vars,  5 metavars *** HMMMM why only 64% of vars have metavar?
 # this meta definitely corresponds to ky71_flattened... which vars don't have meta data?
 
 
+
+
 # which variables do not have a metadat?
-meta_in_ky <- names(ky.raw) %in% meta$var_name
-vars_not_used <- names(ky.raw)[!meta_in_ky]
+meta_in_ky <- names(survey) %in% meta$var_name
+vars_not_used <- names(survey)[!meta_in_ky]
 # oh, turns out that all these variables are 100% missing variables! perfect.
 
 # -------------------------------------------
 # keep observations with HIV test result data
-ky <- ky.raw[!is.na(ky.raw$hiv03), ]
+ky <- survey[!is.na(survey$hiv03), ]
 dim(ky)                # 32,192 obs
-nrow(ky)/nrow(ky.raw)  # 73.7% of obs had HIV
+nrow(ky)/nrow(survey)  # 73.7% of obs had HIV
 # keep only if HIV status == 0 or 1
 ky <- ky[ky$hiv03 %in% c(0,1), ]
 nrow(ky)               # still 32,192 obs - so they were all 0,1
 
 # what percent had HIV data?
-if (nrow(ky.raw) != nrow(ky)) {message( nrow(ky.raw) - nrow(ky)," (", round(100*(nrow(ky.raw)-nrow(ky))/nrow(ky.raw)), "%) observations were dropped." )}
+if (nrow(survey) != nrow(ky)) {message( nrow(survey) - nrow(ky)," (", round(100*(nrow(survey)-nrow(ky))/nrow(survey)), "%) observations were dropped." )}
 
 # what is the prevalence of HIV in the original dataset?
 table(ky$hiv03)           # 91% HIV (-), 8.7% HIV (+)
@@ -310,40 +316,6 @@ cmlg_kenya
 
 
 
-
-
-
-
-# ----------------------------------------------------------
-# Try to do multiple imputation instead of mu?
-
-
-
-# -----------
-# STOP HERE!!
-# -----------
-
-
-if (1==0) {
-    # ------------------------------------------------------------------------------
-    # DO LASSO PREDICTION - code inspired by Don
-    # Use sparse matrix for computational+space efficiency
-      train_x <- sparse.model.matrix(hiv03~., kyt)[,-1]
-      train_y <- as.factor(as.numeric(kyt$hiv03))  # Don did -1, why?
-      test_x <- sparse.model.matrix(hiv03~., kyv)[,-1]
-      test_y <- as.factor(as.numeric(kyv$hiv03))  # Don did -1, why?
-
-      # Find the best lambda from our list via cross-validation (here, we didn't use a validation set). We do this for a fixed mu and rho
-      registerDoParallel(8)
-      cv.out <- cv.glmnet(train_x, train_y, family="binomial", alpha = 1, nfolds=10, type.measure="class", parallel=TRUE)
-      best_lambda <- cv.out$lambda.min
-
-      # Min. mean cross-validation error associated with best lambda
-      min_CVE <- min(cv.out$cvm)
-
-      # Construct lasso model of interest
-      lasso.mod <- glmnet(train_x, train_y, family="binomial", alpha = 1) # alpha=1 => lasso
-}
 
 
 

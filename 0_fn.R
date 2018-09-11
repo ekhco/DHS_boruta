@@ -34,7 +34,7 @@ missingness <- function(var) {
 # *****************************************************
 # given missinginess, and cat/cont threshold Rho, will
 # create a subsetted dataset and return it.
-murho <- function(data, mu = 0.2, rho = 0.2) {
+murho <- function(data, mu = 0.2, rho = 0.2, meta) {
     # ****************************************
     # Set metaparameters:                    *
     Mu  <- mu  # missingness of var          *
