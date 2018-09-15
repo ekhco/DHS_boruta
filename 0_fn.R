@@ -45,8 +45,8 @@ murho <- function(data, mu = 0.2, rho = 0.2, meta) {
     # stratify random forest by gender
     table(data$hv104)
     # split by gender
-    if (1==0) {zw1 <- data[data$hv104 == 1, ]}   # 48% are sex == 1 (ie: MALE)
-    zw1 <- data[data$hv104 %in% c(1,2), ]   # acutally, don't subset my gender
+    # if (1==0) {zw1 <- data[data$hv104 == 1, ]}   # 48% are sex == 1 (ie: MALE)
+    zw1 <- data[!is.na(data$hv104), ]   # acutally, don't subset my gender
     # zw2 <- data[data$hv104 == 2, ]   # 52% are sex == 2 (ie: FEMALE)
 
     # -------------------------------------------
@@ -55,6 +55,7 @@ murho <- function(data, mu = 0.2, rho = 0.2, meta) {
     var.out     <- names.zw1
     length(var.out)
     for (var in names.zw1) {
+        # print(var)
         if (missingness(zw1[,var]) >= Mu) {
             var.out <- var.out[!(var.out %in% c(var))] # remove variable if has missingness >= Mu
         }
@@ -63,7 +64,7 @@ murho <- function(data, mu = 0.2, rho = 0.2, meta) {
     zw1m <- zw1[,var.out]
 
     # what percent of variables were dropped?
-    if (ncol(zw1) != ncol(zw1m)) {message( ncol(zw1) - ncol(zw1m)," (", round(100*(ncol(zw1)-ncol(zw1m))/ncol(zw1)), "%) of variables had >",Mu," missingness and were dropped." )}
+    if (ncol(zw1) != ncol(zw1m)) {cat( ncol(zw1) - ncol(zw1m)," (", round(100*(ncol(zw1)-ncol(zw1m))/ncol(zw1)), "%) of variables had >",Mu," missingness and were dropped.\n", sep="")}
 
     # -------------------------------------------
     # drop any vars that are 1 value
@@ -78,7 +79,7 @@ murho <- function(data, mu = 0.2, rho = 0.2, meta) {
     # subset data to exclude vars with 1 level
     zw1m_ <- zw1m[, var.out]
     # what percent of variables were dropped for having 1 level)
-    if (ncol(zw1m) != ncol(zw1m_)) {message( ncol(zw1m) - ncol(zw1m_)," (", round(100*(ncol(zw1m)-ncol(zw1m_))/ncol(zw1m)), "%) variables had 1 level and were dropped." )}
+    if (ncol(zw1m) != ncol(zw1m_)) {cat( ncol(zw1m) - ncol(zw1m_)," (", round(100*(ncol(zw1m)-ncol(zw1m_))/ncol(zw1m)), "%) variables had 1 level and were dropped.\n", sep="")}
     # summary(zw1m_)
 
 
@@ -94,7 +95,7 @@ murho <- function(data, mu = 0.2, rho = 0.2, meta) {
     }
     zw1m_c <- zw1m_[, var.out]
     # what percent of vars dropped because character?
-    if (ncol(zw1m_c) != ncol(zw1m_)) {message( ncol(zw1m_) - ncol(zw1m_c)," (", round(100*(ncol(zw1m_)-ncol(zw1m_c))/ncol(zw1m_)), "%) variables were character and dropped." )}
+    if (ncol(zw1m_c) != ncol(zw1m_)) {cat( ncol(zw1m_) - ncol(zw1m_c)," (", round(100*(ncol(zw1m_)-ncol(zw1m_c))/ncol(zw1m_)), "%) variables were character and dropped.\n", sep="")}
 
 
 
@@ -119,6 +120,11 @@ murho <- function(data, mu = 0.2, rho = 0.2, meta) {
             levels(zw1m_cc[,var])  <- c(levels(zw1m_cc[,var]), "missing")
             zw1m_cc[is.na(zw1m_cc[,var]), var] <- "missing"
         }
+        # drop it if there are more than 50 levels because ran forest can't even
+        if (length(levels(zw1m_cc[,var])) > 50 ) {
+            # zw1m_cc <- subset(zw1m_cc, select = -c(var))
+            zw1m_cc <- zw1m_cc[ , names(zw1m_cc)[!(names(zw1m_cc) %in% c(var))] ]
+        }
     }
     # turn vars into numeric
     for (var in meta_cont) {
@@ -138,10 +144,10 @@ murho <- function(data, mu = 0.2, rho = 0.2, meta) {
 
     # subset data to only complete case
     zw1m_ccc <- zw1m_cc[obs.keep,]
-    # output message
-    if (nrow(zw1m_ccc) != nrow(zw1m_cc)) {message( nrow(zw1m_cc) - nrow(zw1m_ccc)," (", round(100*(nrow(zw1m_cc)-nrow(zw1m_ccc))/nrow(zw1m_cc)), "%) observations were incomplete cases and were dropped." )}
+    # output
+    if (nrow(zw1m_ccc) != nrow(zw1m_cc)) {cat( nrow(zw1m_cc) - nrow(zw1m_ccc)," (", round(100*(nrow(zw1m_cc)-nrow(zw1m_ccc))/nrow(zw1m_cc)), "%) observations were incomplete cases and were dropped.\n", sep="")}
     d <- zw1m_ccc # put it into a short var name
 
-    message(dim(d)[1], " (", round(100*dim(d)[1]/dim(data)[1]), "%) obs and ", dim(d)[2], " (", round(100*dim(d)[2]/dim(data)[2]), "%) vars remain after mu=", Mu, " and Rho=", Rho, " applied.")
+    cat(dim(d)[1], " (", round(100*dim(d)[1]/dim(data)[1]), "%) obs and ", dim(d)[2], " (", round(100*dim(d)[2]/dim(data)[2]), "%) vars remain after mu=", Mu, " and Rho=", Rho, " applied.\n", sep="")
     return(d)
 } # end murho

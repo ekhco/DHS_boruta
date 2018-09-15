@@ -1,0 +1,549 @@
+
+ANALYZING ao71 ------------------------------------------------------------
+8735 (96%) of variables had >0.15 missingness and were dropped.
+15 (4%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+3733 (30%) observations were incomplete cases and were dropped.
+8527 (70%) obs and 332 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING bf41 ------------------------------------------------------------
+8211 (94%) of variables had >0.15 missingness and were dropped.
+14 (3%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+1781 (23%) observations were incomplete cases and were dropped.
+5985 (77%) obs and 470 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING bf61 ------------------------------------------------------------
+9597 (96%) of variables had >0.15 missingness and were dropped.
+12 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+2930 (19%) observations were incomplete cases and were dropped.
+12738 (81%) obs and 387 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING bu61 ------------------------------------------------------------
+6440 (94%) of variables had >0.15 missingness and were dropped.
+12 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+1912 (22%) observations were incomplete cases and were dropped.
+6878 (78%) obs and 395 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING cd50 ------------------------------------------------------------
+7716 (95%) of variables had >0.15 missingness and were dropped.
+21 (5%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+70 (54%) observations were incomplete cases and were dropped.
+60 (46%) obs and 382 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in eval(predvars, data, env) : object 'hiv03' not found
+In addition: Warning messages:
+1: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+2: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+3: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+4: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING cd61 ------------------------------------------------------------
+8920 (95%) of variables had >0.15 missingness and were dropped.
+14 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+7356 (40%) observations were incomplete cases and were dropped.
+10901 (60%) obs and 420 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING cg5h ------------------------------------------------------------
+1461 (81%) of variables had >0.15 missingness and were dropped.
+13 (4%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+4043 (33%) observations were incomplete cases and were dropped.
+8339 (67%) obs and 321 (18%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING ci50 ------------------------------------------------------------
+5751 (94%) of variables had >0.15 missingness and were dropped.
+11 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+2101 (25%) observations were incomplete cases and were dropped.
+6455 (75%) obs and 358 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+In addition: Warning messages:
+1: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+2: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING ci61 ------------------------------------------------------------
+8324 (95%) of variables had >0.15 missingness and were dropped.
+11 (3%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+3170 (33%) observations were incomplete cases and were dropped.
+6344 (67%) obs and 379 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING cm42 ------------------------------------------------------------
+8587 (96%) of variables had >0.15 missingness and were dropped.
+15 (4%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+4950 (48%) observations were incomplete cases and were dropped.
+5398 (52%) obs and 352 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING cm61 ------------------------------------------------------------
+12676 (97%) of variables had >0.15 missingness and were dropped.
+32 (7%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+6842 (47%) observations were incomplete cases and were dropped.
+7822 (53%) obs and 418 (3%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING dr5a ------------------------------------------------------------
+5467 (94%) of variables had >0.15 missingness and were dropped.
+17 (5%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+1359 (41%) observations were incomplete cases and were dropped.
+1981 (59%) obs and 355 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING dr61 ------------------------------------------------------------
+12278 (97%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+8583 (45%) observations were incomplete cases and were dropped.
+10510 (55%) obs and 427 (3%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  Error in `[.default`(data, , positive) : subscript out of bounds
+In addition: Warning messages:
+1: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+2: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+3: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING dr6a ------------------------------------------------------------
+12305 (97%) of variables had >0.15 missingness and were dropped.
+15 (4%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+1495 (39%) observations were incomplete cases and were dropped.
+2303 (61%) obs and 399 (3%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING et51 ------------------------------------------------------------
+6989 (94%) of variables had >0.15 missingness and were dropped.
+23 (5%) variables had 1 level and were dropped.
+2 (0%) variables were character and dropped.
+45 (21%) observations were incomplete cases and were dropped.
+174 (79%) obs and 436 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in eval(predvars, data, env) : object 'hiv03' not found
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING et61 ------------------------------------------------------------
+6232 (94%) of variables had >0.15 missingness and were dropped.
+14 (4%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+140 (25%) observations were incomplete cases and were dropped.
+428 (75%) obs and 350 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in eval(predvars, data, env) : object 'hiv03' not found
+
+ANALYZING et71 ------------------------------------------------------------
+7675 (95%) of variables had >0.15 missingness and were dropped.
+13 (4%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+8030 (30%) observations were incomplete cases and were dropped.
+18717 (70%) obs and 345 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING ga60 ------------------------------------------------------------
+7960 (96%) of variables had >0.15 missingness and were dropped.
+12 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+4249 (38%) observations were incomplete cases and were dropped.
+7015 (62%) obs and 343 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING gh4a ------------------------------------------------------------
+7037 (94%) of variables had >0.15 missingness and were dropped.
+19 (4%) variables had 1 level and were dropped.
+2 (0%) variables were character and dropped.
+67 (34%) observations were incomplete cases and were dropped.
+130 (66%) obs and 459 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  Error in `[.default`(data, , positive) : subscript out of bounds
+In addition: Warning messages:
+1: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+2: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING gh71 ------------------------------------------------------------
+7127 (94%) of variables had >0.15 missingness and were dropped.
+14 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+1864 (21%) observations were incomplete cases and were dropped.
+7197 (79%) obs and 425 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING gm60 ------------------------------------------------------------
+13237 (96%) of variables had >0.15 missingness and were dropped.
+12 (2%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+2479 (31%) observations were incomplete cases and were dropped.
+5624 (69%) obs and 483 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  Error in `[.default`(data, , positive) : subscript out of bounds
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING gn51 ------------------------------------------------------------
+6003 (92%) of variables had >0.15 missingness and were dropped.
+12 (2%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+2485 (36%) observations were incomplete cases and were dropped.
+4419 (64%) obs and 510 (8%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING gn61 ------------------------------------------------------------
+9094 (95%) of variables had >0.15 missingness and were dropped.
+14 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+2662 (31%) observations were incomplete cases and were dropped.
+5841 (69%) obs and 436 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING hn62 ------------------------------------------------------------
+Error in createDataPartition(y = survhiv$hiv03, p = split, list = FALSE) : 
+  y must have at least 2 data points
+In addition: Warning messages:
+1: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+2: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING ht51 ------------------------------------------------------------
+8240 (95%) of variables had >0.15 missingness and were dropped.
+14 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+2885 (28%) observations were incomplete cases and were dropped.
+7345 (72%) obs and 396 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING ht61 ------------------------------------------------------------
+6979 (94%) of variables had >0.15 missingness and were dropped.
+14 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+5125 (27%) observations were incomplete cases and were dropped.
+13728 (73%) obs and 413 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING ke42 ------------------------------------------------------------
+6092 (93%) of variables had >0.15 missingness and were dropped.
+12 (3%) variables had 1 level and were dropped.
+2 (0%) variables were character and dropped.
+1919 (30%) observations were incomplete cases and were dropped.
+4439 (70%) obs and 432 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING ke51 ------------------------------------------------------------
+6379 (93%) of variables had >0.15 missingness and were dropped.
+10 (2%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+2044 (29%) observations were incomplete cases and were dropped.
+4957 (71%) obs and 447 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+In addition: Warning messages:
+1: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+2: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+3: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING lb51 ------------------------------------------------------------
+6334 (94%) of variables had >0.15 missingness and were dropped.
+10 (2%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+4956 (41%) observations were incomplete cases and were dropped.
+6987 (59%) obs and 411 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING lb6a ------------------------------------------------------------
+8804 (95%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+3002 (36%) observations were incomplete cases and were dropped.
+5417 (64%) obs and 412 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  Error in `[.default`(data, , positive) : subscript out of bounds
+
+ANALYZING ls41 ------------------------------------------------------------
+6627 (93%) of variables had >0.15 missingness and were dropped.
+13 (2%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+2289 (43%) observations were incomplete cases and were dropped.
+3075 (57%) obs and 509 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING ls61 ------------------------------------------------------------
+5862 (93%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+1854 (26%) observations were incomplete cases and were dropped.
+5245 (74%) obs and 429 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING ls72 ------------------------------------------------------------
+5169 (93%) of variables had >0.15 missingness and were dropped.
+15 (4%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+1669 (27%) observations were incomplete cases and were dropped.
+4598 (73%) obs and 392 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING ml51 ------------------------------------------------------------
+8395 (94%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+3314 (37%) observations were incomplete cases and were dropped.
+5633 (63%) obs and 475 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING ml6a ------------------------------------------------------------
+10418 (96%) of variables had >0.15 missingness and were dropped.
+11 (2%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+4332 (48%) observations were incomplete cases and were dropped.
+4699 (52%) obs and 426 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  Error in `[.default`(data, , positive) : subscript out of bounds
+
+ANALYZING mw4a ------------------------------------------------------------
+6257 (93%) of variables had >0.15 missingness and were dropped.
+10 (2%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+1962 (37%) observations were incomplete cases and were dropped.
+3395 (63%) obs and 455 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING mw61 ------------------------------------------------------------
+8739 (94%) of variables had >0.15 missingness and were dropped.
+12 (2%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+5821 (40%) observations were incomplete cases and were dropped.
+8581 (60%) obs and 495 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING mw7a ------------------------------------------------------------
+7848 (95%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+6619 (45%) observations were incomplete cases and were dropped.
+8031 (55%) obs and 391 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING mz51 ------------------------------------------------------------
+2504 (95%) of variables had >0.15 missingness and were dropped.
+9 (7%) variables had 1 level and were dropped.
+2 (2%) variables were character and dropped.
+1559 (9%) observations were incomplete cases and were dropped.
+15417 (91%) obs and 122 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING nm61 ------------------------------------------------------------
+7599 (95%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+2948 (32%) observations were incomplete cases and were dropped.
+6361 (68%) obs and 362 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  Error in `[.default`(data, , positive) : subscript out of bounds
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING rw51 ------------------------------------------------------------
+6273 (92%) of variables had >0.15 missingness and were dropped.
+15 (3%) variables had 1 level and were dropped.
+6 (1%) variables were character and dropped.
+2837 (27%) observations were incomplete cases and were dropped.
+7755 (73%) obs and 488 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING rw61 ------------------------------------------------------------
+7979 (95%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+5633 (42%) observations were incomplete cases and were dropped.
+7889 (58%) obs and 443 (5%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING rw71 ------------------------------------------------------------
+7515 (97%) of variables had >0.15 missingness and were dropped.
+19 (7%) variables had 1 level and were dropped.
+4 (2%) variables were character and dropped.
+4685 (28%) observations were incomplete cases and were dropped.
+12245 (72%) obs and 247 (3%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING sl51 ------------------------------------------------------------
+6415 (92%) of variables had >0.15 missingness and were dropped.
+11 (2%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+2266 (34%) observations were incomplete cases and were dropped.
+4448 (66%) obs and 515 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING sl61 ------------------------------------------------------------
+12263 (96%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+5274 (35%) observations were incomplete cases and were dropped.
+9631 (65%) obs and 431 (3%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  Error in `[.default`(data, , positive) : subscript out of bounds
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING st50 ------------------------------------------------------------
+7674 (94%) of variables had >0.15 missingness and were dropped.
+11 (2%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+1675 (34%) observations were incomplete cases and were dropped.
+3185 (66%) obs and 505 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING sz51 ------------------------------------------------------------
+8704 (97%) of variables had >0.15 missingness and were dropped.
+13 (5%) variables had 1 level and were dropped.
+2 (1%) variables were character and dropped.
+3312 (25%) observations were incomplete cases and were dropped.
+9696 (75%) obs and 224 (3%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING td71 ------------------------------------------------------------
+9445 (96%) of variables had >0.15 missingness and were dropped.
+34 (8%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+3638 (33%) observations were incomplete cases and were dropped.
+7396 (67%) obs and 372 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING tg61 ------------------------------------------------------------
+9495 (96%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+5 (1%) variables were character and dropped.
+3130 (34%) observations were incomplete cases and were dropped.
+6191 (66%) obs and 395 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING tz4a ------------------------------------------------------------
+2163 (86%) of variables had >0.15 missingness and were dropped.
+10 (3%) variables had 1 level and were dropped.
+2 (1%) variables were character and dropped.
+1260 (11%) observations were incomplete cases and were dropped.
+9697 (89%) obs and 338 (13%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+In addition: Warning messages:
+1: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+2: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+3: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+4: In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING tz51 ------------------------------------------------------------
+6713 (94%) of variables had >0.15 missingness and were dropped.
+8 (2%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+3846 (25%) observations were incomplete cases and were dropped.
+11751 (75%) obs and 393 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING tz6a ------------------------------------------------------------
+5544 (92%) of variables had >0.15 missingness and were dropped.
+10 (2%) variables had 1 level and were dropped.
+6 (1%) variables were character and dropped.
+6719 (37%) observations were incomplete cases and were dropped.
+11623 (63%) obs and 472 (8%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING ug6a ------------------------------------------------------------
+4745 (97%) of variables had >0.15 missingness and were dropped.
+12 (7%) variables had 1 level and were dropped.
+2 (1%) variables were character and dropped.
+2750 (9%) observations were incomplete cases and were dropped.
+28894 (91%) obs and 152 (3%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING zm51 ------------------------------------------------------------
+6761 (92%) of variables had >0.15 missingness and were dropped.
+11 (2%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+5282 (47%) observations were incomplete cases and were dropped.
+5854 (53%) obs and 537 (7%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded
+
+ANALYZING zm63 ------------------------------------------------------------
+6940 (94%) of variables had >0.15 missingness and were dropped.
+12 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+15103 (51%) observations were incomplete cases and were dropped.
+14582 (49%) obs and 463 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING zw51 ------------------------------------------------------------
+7206 (94%) of variables had >0.15 missingness and were dropped.
+41 (8%) variables had 1 level and were dropped.
+3 (1%) variables were character and dropped.
+5552 (43%) observations were incomplete cases and were dropped.
+7497 (57%) obs and 447 (6%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in randomForest.default(m, y, ...) : 
+  Can not handle categorical predictors with more than 53 categories.
+
+ANALYZING zw61 ------------------------------------------------------------
+8368 (95%) of variables had >0.15 missingness and were dropped.
+13 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+4557 (32%) observations were incomplete cases and were dropped.
+9755 (68%) obs and 394 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  predicting...  boruting... 
+
+ANALYZING zw71 ------------------------------------------------------------
+8740 (96%) of variables had >0.15 missingness and were dropped.
+14 (3%) variables had 1 level and were dropped.
+4 (1%) variables were character and dropped.
+990 (36%) observations were incomplete cases and were dropped.
+1793 (64%) obs and 386 (4%) vars remain after mu=0.15 and Rho=0.2 applied.
+random foresting...  Error in eval(predvars, data, env) : object 'hiv03' not found
+In addition: Warning message:
+In data.frame(PERCENT_W_HIV_DATA = PERCENT_W_HIV_DATA, N_HAS_HIV_DATA = N_HAS_HIV_DATA,  :
+  row names were found from a short variable and have been discarded

@@ -39,13 +39,13 @@ surveys <- substr(survey_files,1,4) # the survey country/wave ie: zw61
 # surveys_ <- surveys[48:59]
 
 
-survey_filepath <- str_c(srvRDS_dir, surveys[27], ".rds", sep="")
-mtadat_filepath <- str_c(mtadat_dir, surveys[27], "_metadat.dta", sep="")
+survey_filepath <- str_c(srvRDS_dir, surveys[12], ".rds", sep="")  # 27 works
+mtadat_filepath <- str_c(mtadat_dir, surveys[12], "_metadat.dta", sep="")
 
 # ------------------------------------------------------------------------------
 # THIS IS WHERE FUNCTION WOULD START
 # ------------------------------------------------------------------------------
-do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
+do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
 
     # RETURN VARIABLES:
     # PERCENT_W_HIV_DATA - the percent of the original data rows that has HIV results (pre-murho)
@@ -58,11 +58,19 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
 
     survey  <- readRDS(survey_filepath) # survey
     meta    <- data.frame(read_dta(mtadat_filepath)) # meta data
+    sex     <- sex
+
 
     seed    <- 314
     mu      <- 0.15
     rho     <- 0.2
     split   <- 0.80
+
+    # -------------------------------------------
+    # Keep ONLY SEX == sex here
+    survey <- survey[((as.numeric(survey$hv104) == sex) & !is.na(survey$hv104)),  ]
+    SEX <- sex
+    # -------------------------------------------
 
     # -------------------------------------------
     # keep observations with HIV test result data
@@ -120,6 +128,7 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
     N_HAS_HIV_DATA_MURHO <- nrow(survhivt_murhoed)
     N_HIV_POS_MURHO <- table(survhivt_murhoed$hiv03)[2]           # 91% HIV (-), 8.7% HIV (+)
     PREVALENCE_MURHO <- table(survhivt_murhoed$hiv03)[2]/nrow(survhivt_murhoed)
+    N_VARS_MURHO <- ncol(survhivt_murhoed)
 
     #prevalence of HIV in VALIDATION
     # table(survhivv_murhoed$hiv03)
@@ -168,6 +177,7 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
     }
 
 
+    cat("random foresting...  ")
     # Run a random forest with all features
     rf_fit <- NULL
     rf_fit <- randomForest(hiv03 ~ . , data = survhivt_murhoed, importance = TRUE,
@@ -183,7 +193,7 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
 
     get_se(rf_fit)
 
-
+    cat("predicting...  ")
     # do validation
     predictions <- predict(rf_fit, newdata = survhivv_murhoed)
     length(predictions)
@@ -200,6 +210,7 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
 
     # ------------------------------------------------------------------------------
     # Run Boruta to get important features
+    cat("boruting... \n")
     br_fit <- Boruta(hiv03 ~ . , data = survhivt_murhoed) # , doTrace=2) #, strata=hv104)
     summary(br_fit)
     br_fit
@@ -208,7 +219,7 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
     br_fit$mcAdj
 
     # print out BOruta plot
-    pdf(file = str_c("figs/",file,".pdf") )
+    pdf(file = str_c("figs/",file,"_",sex,".pdf"), width=14)
         plot(br_fit)
     dev.off()
 
@@ -250,8 +261,10 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
         N_HIV_POS= N_HIV_POS,
         PREVALENCE = PREVALENCE ,
         N_HAS_HIV_DATA_MURHO = N_HAS_HIV_DATA_MURHO ,
+        N_VARS_MURHO = N_VARS_MURHO,
         N_HIV_POS_MURHO= N_HIV_POS_MURHO,
         PREVALENCE_MURHO = PREVALENCE_MURHO ,
+        SEX = SEX,
         SE = SE,
         SP = SP,
         PPV = PPV,
@@ -276,6 +289,12 @@ do_boruta <- function(survey_filepath, mtadat_filepath, seed) {
 # for each survey, run boruta
 # ------------------------------------------------------------------------------
 all_results <- NULL
+surveys
+
+# ------------------------------------------------------------------------------
+# FOR THE ALL THE MALES/FEMALES ...
+
+cat(date())
 for (file in surveys) {
     # get the survey filepath and it's corresponding metadata filepath
     # survey_filepath <- str_c(survey_dir, survey, "_flattened.dta", sep="")
@@ -283,141 +302,79 @@ for (file in surveys) {
     mtadat_filepath <- str_c(mtadat_dir, file, "_metadat.dta", sep="")
 
     # print it out
-    cat("boruting ", file, "...\n", sep="")
+    message("\nANALYZING ", file, " ------------------------------------------------------------")
 
     # try BORUTA
-    this_result <- NULL
+    this_result_m <- NULL
+    this_result_f <- NULL
 
-    try(   this_result <- cbind(do_boruta(survey_filepath, mtadat_filepath, seed = 314),data.frame(SURVEY = file)) )
-
-    all_results <- rbind(all_results, this_result)
+    # 1 male, 2 female
+    try(   this_result_m <- cbind(do_boruta(survey_filepath, mtadat_filepath, sex=1, seed = 314),data.frame(SURVEY = file)) ) # MALES
+    try(   this_result_f <- cbind(do_boruta(survey_filepath, mtadat_filepath, sex=2, seed = 314),data.frame(SURVEY = file)) ) # FEMALES
+    cat(date()) # output the date finished
+    all_results <- rbind(all_results, this_result_m)
+    all_results <- rbind(all_results, this_result_f)
 }
-# show all results
+
+# write to a file -----------------------
 write.dta(all_results, "all_results.dta")
-all_results
 
 
+# show all results
+head(all_results)
+nrow(all_results)
+date()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# *****************************************************
-# cycle through a bunch of Mu and Rhos, and for each
-# apply the restrictions and see how many are lost
-
-# an array to store results
-sumstats <- data.frame(mu=NA, rho=NA, vars=NA, cat_vars=NA, obs=NA, tn=NA, fn=NA, tp=NA, fp=NA, se=NA, sp=NA, ppv=NA, npv=NA)
-
-# index var for storing meta results
-i = 1
-m = 5; r = 2
-set.seed(314)
-# takes about ... um ... some time to run! 5:26 -
-# loop through Mu and Rho's
-for (m in 1:9) {
-    for (r in 1:4) {
-        mu = m/20; rho = r/10
-        d    <- NULL
-        dtrn <- NULL
-        dtst <- NULL
-        modelFit <- NULL
-        predictions <-NULL
-        cm <- NULL
-
-        try ({
-            # apply mu and rho -------------------------------------
-
-            # append train and test set so can murho (and get same levels)
-            # but then split again
-            survhivt$train <- 1
-            survhivv$train <- 0
-
-            # recombine the train and test sets
-            survhiva <- rbind(survhivt, survhivv)
-            # apply murho to both train and test
-            da <- murho(data = survhiva, mu = mu, rho = rho)
-            # resplit into train and test
-            d  <- da[da$train==1, ]
-            dv <- da[da$train==0, ]
-
-            # count factors
-            factor_i = 0
-            for (var in names(d)) {
-                if (is.factor(d[,var])) {
-                    factor_i <- factor_i + 1
-                }
-            }
-            # do I sample within the dataset after mu/rho, or use survhivv, the validation set?
-
-            # YES, do THIS one! use the validation data that was set aside prior to murho
-            if (do_OOS_valid) { # use OOS validation, the CORRECT way
-                # don't partition the data -----------------------------------
-                # use whole murho's dataset to train
-                # train <- createDataPartition(y = d$hiv03, p=0.80, list=FALSE)
-                # subset using partition
-                dtrn  <- d      # used for fitting the model, and Mu and Rho etc
-                dtst  <- dv  # THE VALIDATION SET,  survhivv (validation) was murho'd
-
-                # build a predictor ------------------------------------
-                message("running randomForest ...")
-                modelFit <- randomForest(hiv03 ~ . , data = dtrn, importance = TRUE)  # will auto center and scale
-
-                # do OUT OF sample validation --------------------------
-                message("RF complete! predicting from test set ...")
-                predictions <- predict(modelFit, newdata=dtst)
-                # compare to actual
-                cm <- confusionMatrix(predictions, dtst$hiv03) # use confusion matrix to EVALUATE
-
-                # store meta results
-                sumstats[i,"mu"] <- mu
-                sumstats[i,"rho"] <- rho
-                sumstats[i,"obs"] <- dim(d)[1]
-                sumstats[i,"vars"] <- dim(d)[2]
-                sumstats[i,"cat_vars"] <- factor_i
-
-                sumstats[i,"tn"] <- cm$table[1,1]
-                sumstats[i,"fn"] <- cm$table[1,2]
-                sumstats[i,"tp"] <- cm$table[2,2]
-                sumstats[i,"fp"] <- cm$table[2,1]
-
-                sumstats[i,"se"] <- cm$byClass["Sensitivity"]
-                sumstats[i,"sp"] <- cm$byClass["Specificity"]
-                sumstats[i,"ppv"] <- cm$byClass["Pos Pred Value"]
-                sumstats[i,"npv"] <- cm$byClass["Neg Pred Value"]
-                message("DONE!\n")
-            }
-            i = i + 1
-        })
-    }
-}
-
-# show results
-sumstats
 
 # ------------------------------------------------------------------------------
-# plot mu vs. # vars
-pdf("figs/mu_vars_oos.pdf", height=4, width=4.7)
-    ggplot(sumstats, aes(x=mu, y=vars)) + geom_point(aes(size=obs))
-dev.off()
+# post analysis of boruta'd survey important variables
+# what is the median (IQR) of the number of important variables?
+#
+# METHODS - Using Random Forest to Identify Those Who Need HIV Testing
+#
+# We harmonized each DHS survey-wave (e.g. Zambia 2014) by merging the
+# instruments and variables that represent the same data across insturments.
+# We treated variables where >20% of the levels had meaningful labels as
+# categorical. This study included only survey-waves where the HIV prevalance
+# was >1%.
+#
+# the random forest prediction was stratified by sex and used complete-cases
+# for each survey-wave for features that had missingness less than 15%.
+# Each survey-wave was split 80-20 for hold-out validation where 80% of the data
+# was used to train a RF to predict HIV+ status, and 20% of the data was used to
+# calculate the prediction characteristics: sensitivity, specificity, positive
+# predictive value (PPV), and negative predictive value (NPV). The number of
+# trees per forest and the number of features sampled was set to be proportional
+# to the number of observations and features of each survey-wave.
+#
+# The Boruta method was used to identify features that were most important in
+# predicting HIV+ status (using permutation importance) with an alpha of 0.01
+# for each of survey-waves.
+#
+# RESULTS
+#
+# We identified 58 survey-waves with HIV prevalence >1%. Prediction was only
+# successful in 3X survey-waves, with a total population of 456,456 individuals
+# of whom 54,657 were HIV+.
 
-# plot mu vs. Sensitivity
-pdf("figs/mu_se_oos.pdf", height=4, width=4.7)
-    ggplot(sumstats[1:32,], aes(x=mu, y=se)) + geom_jitter(width=0.005, height=0.001) + geom_smooth(method="loess")
-dev.off()
+summary(as.numeric(table(all_results$SURVEY)))
+# table(all_results$BORUTA) # count of variable frequency
+features <- data.frame(table(all_results$BORUTA)/length(table(all_results$SURVEY))) # frequency percent
+features <- features[order(-1*features$Freq), ] #sorted
+
+# list important features
+head(features, 50)
+
+# analysis of prediction: Se, Sp, PPV, NPV
+surv_results <- all_results[ , names(all_results)[!(names(all_results) %in% c("BORUTA"))] ] # drop BORUTA
+surv_results <- unique(surv_results) # and get rid of repeated rows (used to be 1 per important var)
+
+# take a look at results
+head(surv_results)
+summary(surv_results)
+# summary of only those with meaningful predictions (ie: Sensitivty not 0, or 1)
+summary(surv_results[!(surv_results$SE %in% c(1,0)),])
 
 
 
@@ -428,4 +385,126 @@ dev.off()
 
 
 
-#      ~ fin ~
+
+
+
+
+
+#
+#
+#
+#
+# # *****************************************************
+# # cycle through a bunch of Mu and Rhos, and for each
+# # apply the restrictions and see how many are lost
+#
+# # an array to store results
+# sumstats <- data.frame(mu=NA, rho=NA, vars=NA, cat_vars=NA, obs=NA, tn=NA, fn=NA, tp=NA, fp=NA, se=NA, sp=NA, ppv=NA, npv=NA)
+#
+# # index var for storing meta results
+# i = 1
+# m = 5; r = 2
+# set.seed(314)
+# # takes about ... um ... some time to run! 5:26 -
+# # loop through Mu and Rho's
+# for (m in 1:9) {
+#     for (r in 1:4) {
+#         mu = m/20; rho = r/10
+#         d    <- NULL
+#         dtrn <- NULL
+#         dtst <- NULL
+#         modelFit <- NULL
+#         predictions <-NULL
+#         cm <- NULL
+#
+#         try ({
+#             # apply mu and rho -------------------------------------
+#
+#             # append train and test set so can murho (and get same levels)
+#             # but then split again
+#             survhivt$train <- 1
+#             survhivv$train <- 0
+#
+#             # recombine the train and test sets
+#             survhiva <- rbind(survhivt, survhivv)
+#             # apply murho to both train and test
+#             da <- murho(data = survhiva, mu = mu, rho = rho)
+#             # resplit into train and test
+#             d  <- da[da$train==1, ]
+#             dv <- da[da$train==0, ]
+#
+#             # count factors
+#             factor_i = 0
+#             for (var in names(d)) {
+#                 if (is.factor(d[,var])) {
+#                     factor_i <- factor_i + 1
+#                 }
+#             }
+#             # do I sample within the dataset after mu/rho, or use survhivv, the validation set?
+#
+#             # YES, do THIS one! use the validation data that was set aside prior to murho
+#             if (do_OOS_valid) { # use OOS validation, the CORRECT way
+#                 # don't partition the data -----------------------------------
+#                 # use whole murho's dataset to train
+#                 # train <- createDataPartition(y = d$hiv03, p=0.80, list=FALSE)
+#                 # subset using partition
+#                 dtrn  <- d      # used for fitting the model, and Mu and Rho etc
+#                 dtst  <- dv  # THE VALIDATION SET,  survhivv (validation) was murho'd
+#
+#                 # build a predictor ------------------------------------
+#                 message("running randomForest ...")
+#                 modelFit <- randomForest(hiv03 ~ . , data = dtrn, importance = TRUE)  # will auto center and scale
+#
+#                 # do OUT OF sample validation --------------------------
+#                 message("RF complete! predicting from test set ...")
+#                 predictions <- predict(modelFit, newdata=dtst)
+#                 # compare to actual
+#                 cm <- confusionMatrix(predictions, dtst$hiv03) # use confusion matrix to EVALUATE
+#
+#                 # store meta results
+#                 sumstats[i,"mu"] <- mu
+#                 sumstats[i,"rho"] <- rho
+#                 sumstats[i,"obs"] <- dim(d)[1]
+#                 sumstats[i,"vars"] <- dim(d)[2]
+#                 sumstats[i,"cat_vars"] <- factor_i
+#
+#                 sumstats[i,"tn"] <- cm$table[1,1]
+#                 sumstats[i,"fn"] <- cm$table[1,2]
+#                 sumstats[i,"tp"] <- cm$table[2,2]
+#                 sumstats[i,"fp"] <- cm$table[2,1]
+#
+#                 sumstats[i,"se"] <- cm$byClass["Sensitivity"]
+#                 sumstats[i,"sp"] <- cm$byClass["Specificity"]
+#                 sumstats[i,"ppv"] <- cm$byClass["Pos Pred Value"]
+#                 sumstats[i,"npv"] <- cm$byClass["Neg Pred Value"]
+#                 message("DONE!\n")
+#             }
+#             i = i + 1
+#         })
+#     }
+# }
+#
+# # show results
+# sumstats
+#
+# # ------------------------------------------------------------------------------
+# # plot mu vs. # vars
+# pdf("figs/mu_vars_oos.pdf", height=4, width=4.7)
+#     ggplot(sumstats, aes(x=mu, y=vars)) + geom_point(aes(size=obs))
+# dev.off()
+#
+# # plot mu vs. Sensitivity
+# pdf("figs/mu_se_oos.pdf", height=4, width=4.7)
+#     ggplot(sumstats[1:32,], aes(x=mu, y=se)) + geom_jitter(width=0.005, height=0.001) + geom_smooth(method="loess")
+# dev.off()
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# #      ~ fin ~
