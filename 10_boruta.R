@@ -319,7 +319,6 @@ for (file in surveys) {
 # write to a file -----------------------
 write.dta(all_results, "all_results.dta")
 
-
 # show all results
 head(all_results)
 nrow(all_results)
@@ -327,44 +326,24 @@ date()
 
 
 
+
 # ------------------------------------------------------------------------------
 # post analysis of boruta'd survey important variables
 # what is the median (IQR) of the number of important variables?
-#
-# METHODS - Using Random Forest to Identify Those Who Need HIV Testing
-#
-# We harmonized each DHS survey-wave (e.g. Zambia 2014) by merging the
-# instruments and variables that represent the same data across insturments.
-# We treated variables where >20% of the levels had meaningful labels as
-# categorical. This study included only survey-waves where the HIV prevalance
-# was >1%.
-#
-# the random forest prediction was stratified by sex and used complete-cases
-# for each survey-wave for features that had missingness less than 15%.
-# Each survey-wave was split 80-20 for hold-out validation where 80% of the data
-# was used to train a RF to predict HIV+ status, and 20% of the data was used to
-# calculate the prediction characteristics: sensitivity, specificity, positive
-# predictive value (PPV), and negative predictive value (NPV). The number of
-# trees per forest and the number of features sampled was set to be proportional
-# to the number of observations and features of each survey-wave.
-#
-# The Boruta method was used to identify features that were most important in
-# predicting HIV+ status (using permutation importance) with an alpha of 0.01
-# for each of survey-waves.
-#
-# RESULTS
-#
-# We identified 58 survey-waves with HIV prevalence >1%. Prediction was only
-# successful in 3X survey-waves, with a total population of 456,456 individuals
-# of whom 54,657 were HIV+.
 
-summary(as.numeric(table(all_results$SURVEY)))
-# table(all_results$BORUTA) # count of variable frequency
-features <- data.frame(table(all_results$BORUTA)/length(table(all_results$SURVEY))) # frequency percent
-features <- features[order(-1*features$Freq), ] #sorted
+library(tableone)
 
-# list important features
-head(features, 50)
+if (1==0) {
+    # how many features were selected
+    summary(as.numeric(table(all_results$SURVEY)))
+    # table(all_results$BORUTA) # count of variable frequency
+    features <- data.frame(table(all_results$BORUTA)/length(table(all_results$SURVEY, all_results$SEX))) # frequency percent
+    features <- features[order(-1*features$Freq), ] #sorted
+
+    # list important features
+    head(features, 15)
+    features
+}
 
 # analysis of prediction: Se, Sp, PPV, NPV
 surv_results <- all_results[ , names(all_results)[!(names(all_results) %in% c("BORUTA"))] ] # drop BORUTA
@@ -374,12 +353,65 @@ surv_results <- unique(surv_results) # and get rid of repeated rows (used to be 
 head(surv_results)
 summary(surv_results)
 # summary of only those with meaningful predictions (ie: Sensitivty not 0, or 1)
-summary(surv_results[!(surv_results$SE %in% c(1,0)),])
+meaningful_results <- surv_results[!(surv_results$SE %in% c(1,0)),]
+meaningful_results$SEX <- factor(meaningful_results$SEX)
+summary(meaningful_results)
+nrow(meaningful_results)
+# how many surveys represented?
+length(table(meaningful_results$SURVEY)[table(meaningful_results$SURVEY)!=0])
+# CreateTableOne(vars = names(meaningful_results), strata = c("SEX"), data = meaningful_results)
+
+# total population possible
+sum(meaningful_results$N_HAS_HIV_DATA)
+# total population analyzed
+sum(meaningful_results$N_HAS_HIV_DATA_MURHO)
+# total population HIV+
+sum(meaningful_results$N_HIV_POS_MURHO)
+
+# feature list from Boruta ---------------------------
 
 
+# read in labels for variables (from zm71)
+labels <- read.csv("/Users/echow/QSU/DHS_boruta/data/dictionary.csv", sep=",")
+head(labels)
+labels$var <- as.character(labels$var)
+labels$label <- as.character(labels$label)
+
+# how many features were selected
+meaningful_features <- all_results[!(all_results$SE %in% c(0,1)), ]
+meaningful_features$SURVEY <- factor(meaningful_features$SURVEY)
+# how many features selected per survey?
+summary(as.numeric(table(meaningful_features$SURVEY)))
+
+# frequency of features
+num_meaningful_surveys <- nrow(unique(meaningful_features[,c("SURVEY", "SEX")]))
+
+# FEATURES OVERALL
+features <- data.frame(table(meaningful_features$BORUTA)/num_meaningful_surveys) # frequency percent
+features <- features[order(-1*features$Freq), ] #sorted
+features$var <- as.character(features$Var1)
+features <- join(features, labels, by=c("var"), type="left", match="first")
+head(features, 15) # list important features
+features
 
 
+# FEATURES FOR MALES
+meaningful_features_m <- meaningful_features[meaningful_features$SEX == 1, ]
+num_meaningful_surveys_m <- nrow(unique(meaningful_features_m[,c("SURVEY", "SEX")]))
+features_m <- data.frame(table(meaningful_features_m$BORUTA)/num_meaningful_surveys_m) # frequency percent
+features_m <- features_m[order(-1*features_m$Freq), ] #sorted
+features_m$var <- as.character(features_m$Var1)
+features_m <- join(features_m, labels, by=c("var"), type="left", match="first")
+features_m
 
+# FEATURES FOR FEMALES
+meaningful_features_f <- meaningful_features[meaningful_features$SEX == 2, ]
+num_feaningful_surveys_f <- nrow(unique(meaningful_features_f[,c("SURVEY", "SEX")]))
+features_f <- data.frame(table(meaningful_features_f$BORUTA)/num_feaningful_surveys_f) # frequency percent
+features_f <- features_f[order(-1*features_f$Freq), ] #sorted
+features_f$var <- as.character(features_f$Var1)
+features_f <- join(features_f, labels, by=c("var"), type="left", match="first")
+features_f
 
 
 
