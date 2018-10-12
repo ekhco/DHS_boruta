@@ -14,9 +14,10 @@ missingness <- function(var) {
     return(count_miss/count_ttl)
 }
 
-
-
-
+# returns a boolean vector of wether string is in each element of da
+isin <- function(string, da){
+  !is.na(str_locate(da, string)[,1])
+}
 
 
 

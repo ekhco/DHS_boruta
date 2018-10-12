@@ -18,12 +18,13 @@ library(caret)
 library(stringr)
 library(randomForest)
 library(ggplot2)
-library(plyr)
+# library(plyr)
 library(devtools)   # install.packages("devtools")
 library(reprtree)   # install_github('araastat/reprtree')
 library(glmnet)     # Library for glmnet ie: LASSO
 library(doParallel) # Library for parallel ops
 library(Boruta)     # feature selection heuristic
+library(pROC)       # for the AUC
 # setwd("D:/EricChow/DHS_ranforest")
 setwd("~/QSU/DHS_boruta")
 # load missinginess and murho fucntions
@@ -31,21 +32,21 @@ source("0_fn.R")
 
 # get list of surveys
 
-survey_dir <- "/Users/echow/DHS_live_abstract/DHS_live_abstract/"
-srvRDS_dir <- "/Users/echow/DHS_live_abstract/DHS_RDS/"
-mtadat_dir <- "/Users/echow/DHS_live_abstract/meta_data/"
+survey_dir <- "/Users/echow8/DHS_live_abstract/DHS_live_abstract/"
+srvRDS_dir <- "/Users/echow8/DHS_live_abstract/DHS_RDS/"
+mtadat_dir <- "/Users/echow8/DHS_live_abstract/meta_data/"
 survey_files <- list.files(survey_dir)
 surveys <- substr(survey_files,1,4) # the survey country/wave ie: zw61
 # surveys_ <- surveys[48:59]
 
 
-survey_filepath <- str_c(srvRDS_dir, surveys[12], ".rds", sep="")  # 27 works
-mtadat_filepath <- str_c(mtadat_dir, surveys[12], "_metadat.dta", sep="")
-
+survey_filepath <- str_c(srvRDS_dir, surveys[8], ".rds", sep="")  # 27 works
+mtadat_filepath <- str_c(mtadat_dir, surveys[8], "_metadat.dta", sep="")
+sex = 1
 # ------------------------------------------------------------------------------
 # THIS IS WHERE FUNCTION WOULD START
 # ------------------------------------------------------------------------------
-do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
+do_boruta <- function(survey_filepath, mtadat_filepath, sex, this_survey, bor_ = 1, seed) {
 
     # RETURN VARIABLES:
     # PERCENT_W_HIV_DATA - the percent of the original data rows that has HIV results (pre-murho)
@@ -121,6 +122,24 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
     da <- murho(data = survhiva, mu = mu, rho = rho, meta = meta)
     # da$hiv03 <- factor(da$hiv03)
 
+    # ----------------------------------------------
+    # drop variables that have too many levels (char)
+    # ----------------------------------------------
+    da <- da[,!(names(da) %in% c("shdist","sdist","_append"))]
+
+    # -----------------------------------------------
+    # drop variables that would perfectly predict HIV
+    # -----------------------------------------------
+    # shiv51 - confirmed HIV status
+    # sh279  - result of determine hiv rdt
+    # sh279a - result of unigold hiv rdt
+    # sh278  - result measurement code of rapid hiv test
+    sh279_vars <- names(da)[isin("sh279", names(da))]
+    sh278_vars <- names(da)[isin("sh278", names(da))]
+
+    da <- da[,!(names(da) %in% c("shiv51", sh279_vars, sh278_vars))]
+
+
     # resplit into train and test
     survhivt_murhoed <- da[da$train==1, ]
     survhivv_murhoed <- da[da$train==0, ]
@@ -141,14 +160,6 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
     # prop.test(table(survhivt_murhoed$hv104, survhivt_murhoed$hiv03))
 
 
-    # ---------------------------------------------
-    #  try to use the # try a random forest
-    # str(survhivt_murhoed, list.len=10) # show factors and # levels
-
-    # just drop it
-    # names(survhivt_murhoed) != "shdist"
-    survhivt_murhoed <- survhivt_murhoed[,!(names(survhivt_murhoed) %in% c("shdist","sdist","_append"))]
-    # registerDoParallel(4)
 
         # -----------------------------------------------------
         # 1. tweak the max # of vars - sqrt, % of vars, any number, mtry
@@ -181,11 +192,17 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
     # Run a random forest with all features
     rf_fit <- NULL
     rf_fit <- randomForest(hiv03 ~ . , data = survhivt_murhoed, importance = TRUE,
-        ntree=ntree, mtry=mtry, nodesize=nodesize, strata = hv104)
+        ntree=ntree, mtry=mtry, nodesize=nodesize) #, strata = hv104)
     rf_fit
     rf_fit$type
     NTREE <- rf_fit$ntree
     MTRY  <- rf_fit$mtry
+
+    # calculate an ROC
+    # head(rf_fit$votes[,2]) # the HIV+ votes
+    # rf_fit.roc <- roc(survhivt_murhoed$hiv03, rf_fit$votes[,2])
+    # plot(rf_fit.roc)
+    # auc(rf_fit.roc)
 
     # list important vars sorted
     imp_rf <- rf_fit$importance[,3]; imp_rf <- data.frame(imp_rf[order(-imp_rf)])
@@ -195,37 +212,54 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
 
     cat("predicting...  ")
     # do validation
-    predictions <- predict(rf_fit, newdata = survhivv_murhoed)
+    predictions <- predict(rf_fit, newdata = survhivv_murhoed)              # classification
+    predi_probs <- predict(rf_fit, newdata = survhivv_murhoed, type="prob") # predicted probabilities
     length(predictions)
+
+    # make an roc dataset from validation set
+    roc.data <- data.frame(ref=survhivv_murhoed$hiv03, prob=predi_probs[,2])
+    roc.data$survey <- this_survey
+    roc.data$sex    <- sex
+    write.dta(roc.data, str_c("data/roc_",this_survey,"_",sex,".dta"))
+    # head(roc.data)
+    predicted.roc <- roc(roc.data$ref, roc.data$prob)
+    # plot(predicted.roc)
+
     # compare to actual
-    cm <- confusionMatrix(data = predictions, reference = survhivv_murhoed$hiv03, , positive = "[1]hiv  positive") # use confusion matrix to EVALUATE
+    cm <- confusionMatrix(data = predictions, reference = survhivv_murhoed$hiv03, positive = as.character(levels(survhivv_murhoed$hiv03)[2])) # use confusion matrix to EVALUATE
 
     # the outcomes
     SE <- cm$byClass["Sensitivity"]
     SP <- cm$byClass["Specificity"]
     PPV <- cm$byClass["Pos Pred Value"]
     NPV <- cm$byClass["Neg Pred Value"]
+    AUC <- auc(predicted.roc)
 
-
+    tn <- cm$table[1,1]
+    tp <- cm$table[2,2]
+    fn <- cm$table[1,2]
+    fp <- cm$table[2,1]
 
     # ------------------------------------------------------------------------------
     # Run Boruta to get important features
-    cat("boruting... \n")
-    br_fit <- Boruta(hiv03 ~ . , data = survhivt_murhoed) # , doTrace=2) #, strata=hv104)
-    summary(br_fit)
-    br_fit
-    br_fit$pValue
-    br_fit$impSource
-    br_fit$mcAdj
+    imprtnt_vars <- NA
+    if (bor_ == 1) {
+        cat("boruting... \n")
+        br_fit <- Boruta(hiv03 ~ . , data = survhivt_murhoed) # , doTrace=2) #, strata=hv104)
+        summary(br_fit)
+        br_fit
+        br_fit$pValue
+        br_fit$impSource
+        br_fit$mcAdj
 
-    # print out BOruta plot
-    pdf(file = str_c("figs/",file,"_",sex,".pdf"), width=14)
-        plot(br_fit)
-    dev.off()
+        # print out BOruta plot
+        pdf(file = str_c("figs/",this_survey,"_",sex,".pdf"), width=14)
+            plot(br_fit)
+        dev.off()
 
-    # get important vars
-    imprtnt_vars <- c(getSelectedAttributes(br_fit, withTentative=FALSE),"hiv03")
-
+        # get important vars
+        imprtnt_vars <- c(getSelectedAttributes(br_fit, withTentative=FALSE),"hiv03")
+    }
                     # --------------------------------------------------------------------------
                     if (1==0) {
                         # Get the selected attributes
@@ -269,12 +303,16 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
         SP = SP,
         PPV = PPV,
         NPV = NPV,
+        AUC = AUC,
+        tn  = tn,
+        tp  = tp,
+        fn  = fn,
+        fp  = fp,
         NTREE = NTREE,
         MTRY = MTRY,
         BORUTA = imprtnt_vars
         )
     )
-
 } # end do_boruta
 
 
@@ -290,7 +328,8 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, seed) {
 # ------------------------------------------------------------------------------
 all_results <- NULL
 surveys
-
+surveys_se1 <- c("ao71", "mw7a", "et71", "zm63", "ls72")
+file <- surveys_se1[4]
 # ------------------------------------------------------------------------------
 # FOR THE ALL THE MALES/FEMALES ...
 
@@ -309,15 +348,15 @@ for (file in surveys) {
     this_result_f <- NULL
 
     # 1 male, 2 female
-    try(   this_result_m <- cbind(do_boruta(survey_filepath, mtadat_filepath, sex=1, seed = 314),data.frame(SURVEY = file)) ) # MALES
-    try(   this_result_f <- cbind(do_boruta(survey_filepath, mtadat_filepath, sex=2, seed = 314),data.frame(SURVEY = file)) ) # FEMALES
+    try(   this_result_m <- cbind(do_boruta(survey_filepath, mtadat_filepath, sex=1, this_survey = file, bor_ = 0, seed = 314),data.frame(SURVEY = file)) ) # MALES
+    try(   this_result_f <- cbind(do_boruta(survey_filepath, mtadat_filepath, sex=2, this_survey = file, bor_ = 0, seed = 314),data.frame(SURVEY = file)) ) # FEMALES
     cat(date()) # output the date finished
     all_results <- rbind(all_results, this_result_m)
     all_results <- rbind(all_results, this_result_f)
 }
-
+all_results_AUC <- all_results
 # write to a file -----------------------
-write.dta(all_results, "all_results.dta")
+write.dta(all_results, "all_results_AUC.dta")
 
 # show all results
 head(all_results)
@@ -325,29 +364,30 @@ nrow(all_results)
 date()
 
 
-
-
 # ------------------------------------------------------------------------------
 # post analysis of boruta'd survey important variables
 # what is the median (IQR) of the number of important variables?
+# ------------------------------------------------------------------------------
+#
+#
+# if (1==0) {
+#     # how many features were selected
+#     summary(as.numeric(table(all_results$SURVEY)))
+#     # table(all_results$BORUTA) # count of variable frequency
+#     features <- data.frame(table(all_results$BORUTA)/length(table(all_results$SURVEY, all_results$SEX))) # frequency percent
+#     features <- features[order(-1*features$Freq), ] #sorted
+#
+#     # list important features
+#     head(features, 15)
+#     features
+# }
 
-library(tableone)
 
-if (1==0) {
-    # how many features were selected
-    summary(as.numeric(table(all_results$SURVEY)))
-    # table(all_results$BORUTA) # count of variable frequency
-    features <- data.frame(table(all_results$BORUTA)/length(table(all_results$SURVEY, all_results$SEX))) # frequency percent
-    features <- features[order(-1*features$Freq), ] #sorted
-
-    # list important features
-    head(features, 15)
-    features
-}
-
+all_results <- read.dta("output_9_18/all_results_9_18.dta")
 # analysis of prediction: Se, Sp, PPV, NPV
 surv_results <- all_results[ , names(all_results)[!(names(all_results) %in% c("BORUTA"))] ] # drop BORUTA
 surv_results <- unique(surv_results) # and get rid of repeated rows (used to be 1 per important var)
+surv_results <- surv_results[order(-1*surv_results$PREVALENCE_MURHO), ] # ordered by prevalence
 
 # take a look at results
 head(surv_results)
@@ -385,6 +425,7 @@ summary(as.numeric(table(meaningful_features$SURVEY)))
 
 # frequency of features
 num_meaningful_surveys <- nrow(unique(meaningful_features[,c("SURVEY", "SEX")]))
+num_meaningful_surveys
 
 # FEATURES OVERALL
 features <- data.frame(table(meaningful_features$BORUTA)/num_meaningful_surveys) # frequency percent
@@ -392,7 +433,6 @@ features <- features[order(-1*features$Freq), ] #sorted
 features$var <- as.character(features$Var1)
 features <- join(features, labels, by=c("var"), type="left", match="first")
 head(features, 15) # list important features
-features
 
 
 # FEATURES FOR MALES
@@ -402,6 +442,7 @@ features_m <- data.frame(table(meaningful_features_m$BORUTA)/num_meaningful_surv
 features_m <- features_m[order(-1*features_m$Freq), ] #sorted
 features_m$var <- as.character(features_m$Var1)
 features_m <- join(features_m, labels, by=c("var"), type="left", match="first")
+head(features_m, 30)
 features_m
 
 # FEATURES FOR FEMALES
@@ -411,17 +452,141 @@ features_f <- data.frame(table(meaningful_features_f$BORUTA)/num_feaningful_surv
 features_f <- features_f[order(-1*features_f$Freq), ] #sorted
 features_f$var <- as.character(features_f$Var1)
 features_f <- join(features_f, labels, by=c("var"), type="left", match="first")
+head(features_f, 60)
 features_f
 
 
 
+# ------------------------------------------------------------------------------
+# PPV and Se, Sp analysis
+# ROC curves
+roc_ <- read.dta("data/roc_ALL.dta")
+meaning_ <- meaningful_results[,c("SURVEY", "SEX")]
+meaning_$survey <- meaning_$SURVEY
+meaning_$sex <- meaning_$SEX
+meaning_$flag <- 1
+meaning_ <- meaning_[,c("survey", "sex", "flag")]
+
+roc <- join(roc_, meaning_, by=c("survey", "sex"), type="left", match="first")
+roc <- roc[!is.na(roc$flag), ]
+head(roc)
+summary(roc)
+unique(roc$survey)
+
+# ROC plot
+roc_p <- roc(roc$ref, roc$prob)
+plot(roc_p, col=0, lty=c(2), main="", grid=c(0.2, 0.2))
+legend(x=0.1, y=0.85,unique(roc$survey),pch=15, col=1:length(unique(roc$survey)), bty="n", cex=0.6)
+legend("bottomright",c("male","female"),lty=1:2, col="black", bty="n", cex=0.6)
+text(0.85,0.80, srt=45, "max AUC=0.87")
+text(0.65,0.5, srt=45, "min AUC=0.65")
+i = 1
+for (survey in unique(roc$survey)) {
+    roc_t <- roc[roc$survey == survey & roc$sex == 1, ]
+    if (nrow(roc_t) != 0) {
+        roc_p <- roc(roc_t$ref, roc_t$prob)
+        plot(roc_p, col=i, lty=1, lwd=0.8, add=TRUE)
+    }
+    i = i+1
+}
+i = 1
+for (survey in unique(roc$survey)) {
+    roc_t <- roc[roc$survey == survey & roc$sex == 2, ]
+    if (nrow(roc_t) != 0) {
+        roc_p <- roc(roc_t$ref, roc_t$prob)
+        plot(roc_p, col=i, lty=2, lwd=0.8, add=TRUE)
+    }
+    i = i+1
+}
 
 
+# get survey list for year
+survey_list <- read.delim("/Users/echow/QSU/DHS_boruta/survey_list/survey_list.csv", sep=",")
+head(survey_list)
+survey_list$SURVEY <- substr(survey_list$filename, 1, 4)
 
+mr <- join(meaningful_results, survey_list[,c("SURVEY","year","country")], by=c("SURVEY"), type="left", match="first")
+ar <- join(all_results, survey_list[,c("SURVEY","year")], by=c("SURVEY"), type="left", match="first")
+head(mr)
+ggplot(mr, aes(year, AUC)) + geom_smooth(method="lm") + geom_point(color="blue")
+auc_time <- lm(AUC ~ year, data=mr)
+summary(auc_time)
+cor(mr$year, mr$AUC)
 
+# get Se/Sp that maximizes the PPV ...
 
+# survey <- unique(roc$survey)[1]
 
+result <- data.frame(survey = NA, sex=NA, se=NA, sp=NA, ppv=NA, thresh=NA, youden=NA)
+i <- 1
+for (survey in unique(roc$survey)) {
+    for (sex in 1:2) {
+        roc_t <- roc[roc$survey == survey & roc$sex == sex, ]
+        if (nrow(roc_t) != 0) {
+            J <- 0          # reset Youden's
+            J_max <- 0
+            opt_thresh <- 0
 
+            # SOLVE FOR BEST YOUDEN'S
+            for (j in 1:500) {
+                # thresh <- i/100
+                # subset predictions to this survey
+                # calculate and apply threshold to probability
+                thresh <- j/500 # table(roc_t$ref)[2]/nrow(roc_t) # set the threshold to the prevalence}
+                roc_t$class <- factor(as.numeric(roc_t$prob >= thresh))
+                # make the same factor levels
+                levels(roc_t$class) <- levels(roc_t$ref)
+                # get Se, Sp, PPV, NPV
+                cm <- confusionMatrix(data = roc_t$class, reference = roc_t$ref, positive = as.character(levels(roc_t$ref)[2])) # use confusion matrix to EVALUATE
+                se <- cm$byClass["Sensitivity"]
+                sp <- cm$byClass["Specificity"]
+                ppv <- cm$byClass["Pos Pred Value"]
+                npv <- cm$byClass["Neg Pred Value"]
+
+                # Youden's index
+                J <- se + sp - 1
+                if (J > J_max) {
+                    J_max <- J
+                    opt_thresh <- thresh
+                }
+            } # finish solving for best Youden's
+
+            # --------------------------------------------
+            # calcuate the Se/Sp with best Youden's
+            thresh <- opt_thresh # table(roc_t$ref)[2]/nrow(roc_t) # set the threshold to the prevalence}
+            roc_t$class <- factor(as.numeric(roc_t$prob >= thresh))
+            # make the same factor levels
+            levels(roc_t$class) <- levels(roc_t$ref)
+            # get Se, Sp, PPV, NPV
+            cm <- confusionMatrix(data = roc_t$class, reference = roc_t$ref, positive = as.character(levels(roc_t$ref)[2])) # use confusion matrix to EVALUATE
+            se <- cm$byClass["Sensitivity"]
+            sp <- cm$byClass["Specificity"]
+            ppv <- cm$byClass["Pos Pred Value"]
+            npv <- cm$byClass["Neg Pred Value"]
+
+            # ---------------------------------
+            # set results se; sp; ppv; npv
+            result[i, "survey"] <- survey
+            result[i, "se"] <- se
+            result[i, "sp"] <- sp
+            result[i, "ppv"] <- ppv
+            result[i, "thresh"] <- thresh
+            result[i, "youden"] <- J_max
+            result[i, "sex"] <- sex
+            i = i + 1
+        } # end if nrow
+    } # end sex
+} # end survey loop
+
+result
+abstract_surveys <- meaningful_results[,c("SURVEY", "SEX")]
+abstract_surveys$survey <- abstract_surveys$SURVEY
+abstract_surveys$sex <- abstract_surveys$SEX
+
+result_abstract <- join(abstract_surveys, result, by=c("survey", "sex"), type="left", match="first")
+result_abstract
+nrow(result_abstract)
+summary(result_abstract)
 #
 #
 #
