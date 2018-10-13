@@ -40,8 +40,8 @@ surveys <- substr(survey_files,1,4) # the survey country/wave ie: zw61
 # surveys_ <- surveys[48:59]
 
 
-survey_filepath <- str_c(srvRDS_dir, surveys[8], ".rds", sep="")  # 27 works
-mtadat_filepath <- str_c(mtadat_dir, surveys[8], "_metadat.dta", sep="")
+survey_filepath <- str_c(srvRDS_dir, surveys[55], ".rds", sep="")  # 27 works
+mtadat_filepath <- str_c(mtadat_dir, surveys[55], "_metadat.dta", sep="")
 sex = 1
 # ------------------------------------------------------------------------------
 # THIS IS WHERE FUNCTION WOULD START
@@ -134,10 +134,19 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, this_survey, bor_ =
     # sh279  - result of determine hiv rdt
     # sh279a - result of unigold hiv rdt
     # sh278  - result measurement code of rapid hiv test
+    # sh235  - result of determine hiv rdt
+    # sh235a - result of unigold hiv rdt
+    # sh234  - result measurement code of rapid hiv test
+    #
+    # sh224 ??? - read consent statement - rapid hiv test
+
     sh279_vars <- names(da)[isin("sh279", names(da))]
     sh278_vars <- names(da)[isin("sh278", names(da))]
 
-    da <- da[,!(names(da) %in% c("shiv51", sh279_vars, sh278_vars))]
+    sh235_vars <- names(da)[isin("sh235", names(da))]
+    sh234_vars <- names(da)[isin("sh234", names(da))]
+
+    da <- da[,!(names(da) %in% c("shiv51", sh279_vars, sh278_vars, sh235_vars, sh234_vars))]
 
 
     # resplit into train and test
@@ -220,6 +229,7 @@ do_boruta <- function(survey_filepath, mtadat_filepath, sex, this_survey, bor_ =
     roc.data <- data.frame(ref=survhivv_murhoed$hiv03, prob=predi_probs[,2])
     roc.data$survey <- this_survey
     roc.data$sex    <- sex
+    # write.dta(roc.data, str_c("data/roc_zm63_2.dta"))
     write.dta(roc.data, str_c("data/roc_",this_survey,"_",sex,".dta"))
     # head(roc.data)
     predicted.roc <- roc(roc.data$ref, roc.data$prob)
